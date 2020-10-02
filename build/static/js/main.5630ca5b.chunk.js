@@ -1,0 +1,2 @@
+(this["webpackJsonppetful-client"]=this["webpackJsonppetful-client"]||[]).push([[0],{3:function(e,t,n){e.exports=n(9)},4:function(e,t,n){},9:function(e,t,n){"use strict";n.r(t);n(4);var l=n(0),u=n.n(l),c=n(2);var r=function(){return u.a.createElement("div",null,u.a.createElement("h1",null,"Petful"))};n.n(c).a.render(u.a.createElement(r,null),document.getElementById("root"))}},[[3,1,2]]]);
+//# sourceMappingURL=main.5630ca5b.chunk.js.map
