@@ -1,9 +1,18 @@
 import React, { Component } from "react";
 import PetInfo from "./PetInfo";
+import { Route, Switch } from "react-router-dom";
 
-
+import JoinButton from "./JoinButton";
 
 export default class AdoptionPage extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      isHidden: true,
+    };
+  }
+
   render() {
     const testCat = {
       age: 1,
@@ -33,9 +42,7 @@ export default class AdoptionPage extends Component {
         <PetInfo pet={testCat}></PetInfo>
         <PetInfo pet={testDog}></PetInfo>
 
-        <p>
-          
-        </p>
+        {!this.props.isHidden && <JoinButton></JoinButton>}
       </div>
     );
   }
