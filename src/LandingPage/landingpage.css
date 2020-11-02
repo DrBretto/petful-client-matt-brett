@@ -1,0 +1,23 @@
+.button {
+  text-align: center;
+}
+.landingpageBody {
+  max-width: 500px;
+  margin: auto;
+}
+.landingpageImage {
+  width: 600px;
+}
+.centerimage {
+  text-align: center;
+}
+
+@media all and (max-width: 600px) {
+  .landingpageImage {
+    width: 300px;
+  }
+  .landingpageBody {
+    max-width: 300px;
+    margin: auto;
+  }
+}

@@ -1,0 +1,58 @@
+html > * {
+  color: black;
+  font-size: 1em;
+}
+
+.adopt,
+.pet,
+.petInfo,
+.userInput,
+.landingpageBody {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.landingpageBody {
+  width: 90vw;
+}
+
+.users {
+  display: flex;
+}
+
+.userList {
+  width: 40%;
+  font-size: 75%;
+  text-align: right;
+  padding: 0.5em;
+}
+
+.userInput {
+  padding: 0.5em;
+  font-size: 75%;
+  justify-content: space-around;
+  width: 65%;
+  text-align: right;
+}
+
+.adopt {
+  width: 99%;
+}
+
+.landingpageBody {
+}
+
+.petInfo {
+  width: 95%;
+}
+
+@media all and (max-width: 400px) {
+  button {
+    font-size: 75%;
+  }
+
+  input {
+    width: 50%;
+  }
+}

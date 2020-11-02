@@ -1,0 +1,9 @@
+header{
+    text-align: center;
+}
+
+header a{
+    text-decoration: none;
+    color: #fdbd0e;
+    line-height: 1.5em
+}
