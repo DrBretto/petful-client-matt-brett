@@ -47,6 +47,18 @@ export default class AdoptionPage extends Component {
     //   });
     // });
 
+    const initialUsers = [
+      "Christen Coggin",
+      "Buddy Blakely",
+      "Britany Bowie",
+      "Rashad Roa",
+      "Teresia Tenenbaum",
+    ];
+
+    this.setState({
+      users: initialUsers,
+    });
+
     this.interval = setInterval(() => {
       this.handleInterval();
     }, 5000);
@@ -99,57 +111,51 @@ export default class AdoptionPage extends Component {
 
   handleAddPerson = (e) => {
     e.preventDefault();
+    let users = this.state.users
     const { name } = e.target;
     usersApiService.postUsers(name.value).then((res) => {
-      console.log(res);
-      this.setState({
-        currentUser: name.value,
-      });
+      users.shift();
+      users.push(res.name);
+      this.setState({ users: users });
     });
     console.log(this.state.currentUser);
   };
 
   handleInterval() {
-    const users = this.state.users;
-    const cats = this.state.cats;
-    const dogs = this.state.dogs;
+    let users = this.state.users;
 
-    const currentUser = this.state.currentUser;
-    let nextInLine = this.state.nextInLine;
+    const randomUsers = [
+      "Christen Coggin",
+      "Buddy Blakely",
+      "Britany Bowie",
+      "Rashad Roa",
+      "Teresia Tenenbaum",
+      "Loma Lisk",
+      "Emilee Eslick",
+      "Tamera Trollinger",
+      "Ethelene Eis",
+      "Janita Jester",
+      "Harris Hagedorn",
+      "Verona Vina",
+      "Lenita Levitsky",
+      "Lida Lindgren",
+      "aola Paquin",
+      "Dianna Doman",
+      "Ashanti Amo",
+      "Filiberto Fortin",
+      "Reagan Reichenbach",
+      "Dacia Denley",
+    ];
 
-    if (nextInLine === currentUser) {
-      if (users.length < 4) {
-        const random = [
-          "Cheddar Bob",
-          "Billy Bob",
-          "Bobcat Goldthwait",
-          "Uncle Bob",
-          "What about Bob",
-        ];
-        let randomPerson = random[Math.floor(Math.random() * 4)];
-        usersApiService.postUsers(randomPerson).then(() => {
-          users.push(randomPerson);
-          this.setState({ users: users });
-        });
-      }
-    } else if (users.length > 0) {
-      const petType = users.length % 2 === 0 ? "cats" : "dogs";
-      petsApiService.deletePet(petType).then(() => {
-        if (petType === "cats") {
-          cats.shift();
-        } else {
-          dogs.shift();
-        }
-        users.shift();
+    let randomPerson =
+      randomUsers[Math.floor(Math.random() * randomUsers.length - 1)];
 
-        this.setState({
-          users: users,
-          cats: cats,
-          dogs: dogs,
-          nextInLine: users[0],
-        });
-      });
-    }
+    usersApiService.postUsers(randomPerson).then((res) => {
+    console.log("AdoptionPage -> handleInterval -> re", res)
+      users.shift();
+      users.push(randomPerson);
+      this.setState({ users: users });
+    });
   }
 
   render() {
@@ -159,12 +165,12 @@ export default class AdoptionPage extends Component {
       <div>
         <section className="users light window">
           <div className="userInput">
-          <h2> People in line to adopt {"--->"}</h2>
-          <form className="nameForm" onSubmit={this.handleAddPerson}>
-            <label htmlFor="adoptForm">Name</label>
-            <input name="name" type="text" />
-            <button type="submit">Get In Line</button>
-          </form>
+            <h2> People in line to adopt {"--->"}</h2>
+            <form className="nameForm" onSubmit={this.handleAddPerson}>
+              <label htmlFor="adoptForm">Name</label>
+              <input name="name" type="text" />
+              <button type="submit">Get In Line</button>
+            </form>
           </div>
           <Users users={users} />
         </section>

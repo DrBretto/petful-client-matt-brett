@@ -1,32 +1,31 @@
-import config from '../config';
+import config from "../config";
 
-const usersApiService = { 
+const usersApiService = {
   getUsers() {
-    return fetch(`${config.API_ENDPOINT}/user`)
-      .then(res =>
-        !res.ok ? res.json().then(e => Promise.reject(e)) : res.json());
+    return fetch(`${config.API_ENDPOINT}/user`).then((res) =>
+      !res.ok ? res.json().then((e) => Promise.reject(e)) : res.json()
+    );
   },
-  postUsers(data){
-    let user ={name:data}
+  postUsers(data) {
+    let user = { name: data };
     return fetch(`${config.API_ENDPOINT}/user`, {
-      method: 'POST',
-      headers: {'content-type': 'application/json'},
-      body: JSON.stringify(user)
-    })
-    .then((res) =>
-    !res.ok ? res.json().then((e) => Promise.reject(e)) : res.json()
-  );
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(user),
+    }).then((res) =>
+      !res.ok ? res.json().then((e) => Promise.reject(e)) : res.json()
+    );
   },
   deleteUser() {
     return fetch(`${config.API_ENDPOINT}/user`, {
-      method: 'DELETE',
+      method: "DELETE",
       headers: {
-        'content-type': 'application/json',
+        "content-type": "application/json",
       },
     }).then((res) =>
-      !res.ok ? res.json().then((e) => Promise.reject(e)) : Promise.resolve('')
+      !res.ok ? res.json().then((e) => Promise.reject(e)) : Promise.resolve("")
     );
-  }
+  },
 };
 
 export default usersApiService;
