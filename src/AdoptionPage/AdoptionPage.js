@@ -10,22 +10,16 @@ export default class AdoptionPage extends Component {
   state = {
     cat: {},
     dog: {},
-    users: [
-      "Cheddar Bob",
-      "Billy Bob",
-      "Bobcat Goldthwait",
-      "Uncle Bob",
-      "What about Bob",
-    ],
-    currentUser: "",
+    users: [],
+    currentUser: "Nobody",
     nextInLine: "",
+    timeToPick: 5,
   };
 
   componentDidMount() {
     dogsApiService
       .getDogs()
       .then((res) => {
-        console.log("AdoptionPage -> componentDidMount -> res", res);
         this.setState({
           dog: res.data,
         });
@@ -41,36 +35,9 @@ export default class AdoptionPage extends Component {
       })
       .catch((res) => this.setState({ error: res.message }));
 
-    // usersApiService.getUsers().then((res) => {
-    //   this.setState({
-    //     users: res,
-    //   });
-    // });
-
-    const initialUsers = [
-      "Christen Coggin",
-      "Buddy Blakely",
-      "Britany Bowie",
-      "Rashad Roa",
-      "Teresia Tenenbaum",
-    ];
-
-    this.setState({
-      users: initialUsers,
-    });
-
     this.interval = setInterval(() => {
       this.handleInterval();
-    }, 5000);
-  }
-
-  updateUser() {
-    usersApiService.postUsers().then((res) => {
-      this.setState({
-        users: res,
-        user: res[0].name,
-      });
-    });
+    }, 1000);
   }
 
   deleteDog = () => {
@@ -109,57 +76,88 @@ export default class AdoptionPage extends Component {
     }
   };
 
+  populateList() {
+    let users = [];
+    usersApiService.getUsers().then((res) => {
+      if (res.hasOwnProperty("nextinline")) {
+        users[0] = res.nextinline.data.name;
+        if (!!res.nextinline.hasOwnProperty("next")) {
+          users[1] = res.nextinline.next.data.name;
+          if (!!res.nextinline.next.hasOwnProperty("next")) {
+            users[2] = res.nextinline.next.next.data.name;
+            if (!!res.nextinline.next.next.hasOwnProperty("next")) {
+              users[3] = res.nextinline.next.next.next.data.name;
+              if (!!res.nextinline.next.next.next.hasOwnProperty("next")) {
+                users[4] = res.nextinline.next.next.next.next.data.name;
+              }
+            }
+          }
+        }
+      
+      this.setState({
+        currentUser: users[0],
+        users: users,
+      });
+    }
+    });
+  }
+
   handleAddPerson = (e) => {
     e.preventDefault();
-    let users = this.state.users
     const { name } = e.target;
     usersApiService.postUsers(name.value).then((res) => {
-      users.shift();
-      users.push(res.name);
-      this.setState({ users: users });
+      this.populateList();
     });
-    console.log(this.state.currentUser);
   };
 
   handleInterval() {
     let users = this.state.users;
+    let timer = this.state.timeToPick;
+    if (timer === 0) {
+      if (users.length < 6) {
+        const randomUsers = [
+          "Christen Coggin",
+          "Buddy Blakely",
+          "Britany Bowie",
+          "Rashad Roa",
+          "Teresia Tenenbaum",
+          "Loma Lisk",
+          "Emilee Eslick",
+          "Tamera Trollinger",
+          "Ethelene Eis",
+          "Janita Jester",
+          "Harris Hagedorn",
+          "Verona Vina",
+          "Lenita Levitsky",
+          "Lida Lindgren",
+          "Paola Paquin",
+          "Dianna Doman",
+          "Ashanti Amo",
+          "Filiberto Fortin",
+          "Reagan Reichenbach",
+          "Dacia Denley",
+        ];
 
-    const randomUsers = [
-      "Christen Coggin",
-      "Buddy Blakely",
-      "Britany Bowie",
-      "Rashad Roa",
-      "Teresia Tenenbaum",
-      "Loma Lisk",
-      "Emilee Eslick",
-      "Tamera Trollinger",
-      "Ethelene Eis",
-      "Janita Jester",
-      "Harris Hagedorn",
-      "Verona Vina",
-      "Lenita Levitsky",
-      "Lida Lindgren",
-      "aola Paquin",
-      "Dianna Doman",
-      "Ashanti Amo",
-      "Filiberto Fortin",
-      "Reagan Reichenbach",
-      "Dacia Denley",
-    ];
+        let randomPerson =
+          randomUsers[Math.floor(Math.random() * (randomUsers.length - 1))];
 
-    let randomPerson =
-      randomUsers[Math.floor(Math.random() * randomUsers.length - 1)];
-
-    usersApiService.postUsers(randomPerson).then((res) => {
-    console.log("AdoptionPage -> handleInterval -> re", res)
-      users.shift();
-      users.push(randomPerson);
-      this.setState({ users: users });
-    });
+        usersApiService.postUsers(randomPerson).then((res) => {
+          this.populateList();
+        });
+        this.setState({
+          timeToPick: 5,
+        });
+      }
+    } else {
+      this.setState({
+        timeToPick: timer - 1,
+      });
+      this.populateList();
+    }
   }
 
   render() {
-    const { cat, dog, users, error } = this.state;
+    const { cat, dog, users, error, currentUser, timeToPick } = this.state;
 
     return (
       <div>
@@ -176,6 +174,7 @@ export default class AdoptionPage extends Component {
         </section>
 
         <div className="adopt window">
+          <h2>{currentUser} has {timeToPick} seconds to pick</h2>
           <section className="petInfo light window">
             <h2>Dogs</h2>
             <Adopt
