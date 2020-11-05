@@ -34,6 +34,7 @@ export default class AdoptionPage extends Component {
         });
       })
       .catch((res) => this.setState({ error: res.message }));
+    this.populateList();
 
     this.interval = setInterval(() => {
       this.handleInterval();
@@ -80,26 +81,28 @@ export default class AdoptionPage extends Component {
     let users = [];
     usersApiService.getUsers().then((res) => {
       if (res.hasOwnProperty("nextinline")) {
-        users[0] = res.nextinline.data.name;
+        users[0] = res.nextinline.data;
         if (!!res.nextinline.hasOwnProperty("next")) {
-          users[1] = res.nextinline.next.data.name;
+          users[1] = res.nextinline.next.data;
           if (!!res.nextinline.next.hasOwnProperty("next")) {
-            users[2] = res.nextinline.next.next.data.name;
+            users[2] = res.nextinline.next.next.data;
             if (!!res.nextinline.next.next.hasOwnProperty("next")) {
-              users[3] = res.nextinline.next.next.next.data.name;
+              users[3] = res.nextinline.next.next.next.data;
               if (!!res.nextinline.next.next.next.hasOwnProperty("next")) {
-                users[4] = res.nextinline.next.next.next.next.data.name;
+                users[4] = res.nextinline.next.next.next.next.data;
               }
             }
           }
         }
-      
-      this.setState({
-        currentUser: users[0],
-        users: users,
-      });
-    }
+
+        this.setState({
+          currentUser: users[0],
+          users: users,
+        });
+      }
     });
+
+    console.log("AdoptionPage -> populateList -> users", users);
   }
 
   handleAddPerson = (e) => {
@@ -113,8 +116,8 @@ export default class AdoptionPage extends Component {
   handleInterval() {
     let users = this.state.users;
     let timer = this.state.timeToPick;
-    if (timer === 0) {
-      if (users.length < 6) {
+    if (timer <= 0) {
+      if (users.length < 5) {
         const randomUsers = [
           "Christen Coggin",
           "Buddy Blakely",
@@ -147,6 +150,10 @@ export default class AdoptionPage extends Component {
         this.setState({
           timeToPick: 5,
         });
+      } else {
+        usersApiService.deleteUser().then((res) => {
+          console.log("delete service run");
+        });
       }
     } else {
       this.setState({
@@ -174,7 +181,9 @@ export default class AdoptionPage extends Component {
         </section>
 
         <div className="adopt window">
-          <h2>{currentUser} has {timeToPick} seconds to pick</h2>
+          <h2>
+            {currentUser.name} has {timeToPick} seconds to pick
+          </h2>
           <section className="petInfo light window">
             <h2>Dogs</h2>
             <Adopt

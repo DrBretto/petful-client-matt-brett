@@ -6,7 +6,7 @@ export default class Users extends Component{
     renderUsers(){
         const usersList = this.props.users.map((user, i) => {
           return(
-            <div key={i}>{user}</div>
+            <div key={i}>{user.name}</div>
           );
         });
         return usersList;
