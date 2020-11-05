@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import Users from "../Users/Users";
 import Adopt from "../Adopt/Adopt";
-import petsApiService from "../services/pets-service";
+//import petsApiService from "../services/pets-service";
 import dogsApiService from "../services/dogs-service";
 import catsApiService from "../services/cats-service";
 import usersApiService from "../services/users-service";
@@ -41,7 +41,7 @@ export default class AdoptionPage extends Component {
   }
 
   deleteDog = () => {
-    petsApiService.deleteDog();
+    dogsApiService.deleteDog();
     let updatedDogs = [...this.state.dogs];
     updatedDogs.shift();
     this.updateUser();
@@ -51,7 +51,7 @@ export default class AdoptionPage extends Component {
   };
 
   deleteCat = () => {
-    petsApiService.deleteCat();
+    catsApiService.deleteCat();
     let updatedCats = [...this.state.cats];
     updatedCats.shift();
     this.updateUser();
@@ -66,6 +66,7 @@ export default class AdoptionPage extends Component {
     } else {
       this.adoptPet("dogs");
     }
+    this.deleteDog();
   };
 
   adoptCat = (option) => {
@@ -74,33 +75,23 @@ export default class AdoptionPage extends Component {
     } else {
       this.adoptPet("cats");
     }
+    this.deleteCat();
   };
 
-  populateList() {
+  populateList = () => {
     let users = [];
     usersApiService.getUsers().then((res) => {
-      if (res.hasOwnProperty("nextinline")) {
-        users[0] = res.nextinline.data.name;
-        if (!!res.nextinline.hasOwnProperty("next")) {
-          users[1] = res.nextinline.next.data.name;
-          if (!!res.nextinline.next.hasOwnProperty("next")) {
-            users[2] = res.nextinline.next.next.data.name;
-            if (!!res.nextinline.next.next.hasOwnProperty("next")) {
-              users[3] = res.nextinline.next.next.next.data.name;
-              if (!!res.nextinline.next.next.next.hasOwnProperty("next")) {
-                users[4] = res.nextinline.next.next.next.next.data.name;
-              }
-            }
-          }
-        }
-      
+      console.log(res)
+      for(let i=0; i<res.length;i++){
+        if(i<=5) users.push(res[i])
+      }
       this.setState({
-        currentUser: users[0],
-        users: users,
-      });
-    }
-    });
-  }
+      currentUser: users[0],
+      users: users,
+    })
+    })
+    console.log(users)
+  };
 
   handleAddPerson = (e) => {
     e.preventDefault();
@@ -121,21 +112,21 @@ export default class AdoptionPage extends Component {
           "Britany Bowie",
           "Rashad Roa",
           "Teresia Tenenbaum",
-          "Loma Lisk",
-          "Emilee Eslick",
-          "Tamera Trollinger",
-          "Ethelene Eis",
-          "Janita Jester",
-          "Harris Hagedorn",
-          "Verona Vina",
-          "Lenita Levitsky",
-          "Lida Lindgren",
-          "Paola Paquin",
-          "Dianna Doman",
-          "Ashanti Amo",
-          "Filiberto Fortin",
-          "Reagan Reichenbach",
-          "Dacia Denley",
+          // "Loma Lisk",
+          // "Emilee Eslick",
+          // "Tamera Trollinger",
+          // "Ethelene Eis",
+          // "Janita Jester",
+          // "Harris Hagedorn",
+          // "Verona Vina",
+          // "Lenita Levitsky",
+          // "Lida Lindgren",
+          // "Paola Paquin",
+          // "Dianna Doman",
+          // "Ashanti Amo",
+          // "Filiberto Fortin",
+          // "Reagan Reichenbach",
+          // "Dacia Denley",
         ];
 
         let randomPerson =
@@ -148,6 +139,7 @@ export default class AdoptionPage extends Component {
           timeToPick: 5,
         });
       }
+      //needs a check for if its the user or name is from list of randomusers
     } else {
       this.setState({
         timeToPick: timer - 1,
@@ -179,7 +171,6 @@ export default class AdoptionPage extends Component {
             <h2>Dogs</h2>
             <Adopt
               dog={dog}
-              adopt={this.deleteDog}
               adopt={this.adoptDog}
               user={users}
               error={error}
@@ -190,7 +181,6 @@ export default class AdoptionPage extends Component {
             <h2>Cats</h2>
             <Adopt
               cat={cat}
-              adopt={this.deleteCat}
               adopt={this.adoptCat}
               user={users}
               error={error}
