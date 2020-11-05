@@ -12,8 +12,7 @@ export default class AdoptionPage extends Component {
     dog: {},
     users: [],
     currentUser: "Nobody",
-    nextInLine: "",
-    timeToPick: 5,
+    clientUser: "",
   };
 
   componentDidMount() {
@@ -34,11 +33,14 @@ export default class AdoptionPage extends Component {
         });
       })
       .catch((res) => this.setState({ error: res.message }));
-    this.populateList();
 
-    this.interval = setInterval(() => {
-      this.handleInterval();
-    }, 1000);
+    usersApiService
+      .getUsers()
+      .then((res) => {
+      console.log("AdoptionPage -> componentDidMount -> res", res)
+        this.populateList(res);
+      })
+      .catch((res) => this.setState({ error: res.message }));
   }
 
   deleteDog = () => {
@@ -79,82 +81,87 @@ export default class AdoptionPage extends Component {
     this.deleteCat();
   };
 
-  populateList = () => {
+  populateList(data) {
+    console.log("AdoptionPage -> populateList -> data", data);
     let users = [];
-    usersApiService.getUsers().then((res) => {
-      console.log(res)
-      for(let i=0; i<res.length;i++){
-        if(i<=5) users.push(res[i])
+
+    if (data.hasOwnProperty("next")) {
+      users[0] = data.data;
+      if (!!data.hasOwnProperty("next")) {
+        users[1] = data.next.data;
+        if (!!data.next.hasOwnProperty("next")) {
+          users[2] = data.next.next.data;
+          if (!!data.next.next.hasOwnProperty("next")) {
+            users[3] = data.next.next.next.data;
+            if (!!data.next.next.next.hasOwnProperty("next")) {
+              users[4] = data.next.next.next.next.data;
+            }
+          }
+        }
       }
+
       this.setState({
-      currentUser: users[0],
-      users: users,
-    })
-    })
-    console.log(users)
-  };
+        currentUser: users[0],
+        users: users,
+      });
+    }
+
+    console.log("AdoptionPage -> populateList -> users", this.state.users);
+  }
 
   handleAddPerson = (e) => {
     e.preventDefault();
     const { name } = e.target;
     usersApiService.postUsers(name.value).then((res) => {
-      this.populateList();
+      this.interval = setInterval(() => {
+        this.handleInterval();
+      }, 5000);
+      this.populateList(res);
     });
   };
 
   handleInterval() {
     let users = this.state.users;
-    let timer = this.state.timeToPick;
-    if (timer <= 0) {
-      if (users.length < 5) {
-        const randomUsers = [
-          "Christen Coggin",
-          "Buddy Blakely",
-          "Britany Bowie",
-          "Rashad Roa",
-          "Teresia Tenenbaum",
-          // "Loma Lisk",
-          // "Emilee Eslick",
-          // "Tamera Trollinger",
-          // "Ethelene Eis",
-          // "Janita Jester",
-          // "Harris Hagedorn",
-          // "Verona Vina",
-          // "Lenita Levitsky",
-          // "Lida Lindgren",
-          // "Paola Paquin",
-          // "Dianna Doman",
-          // "Ashanti Amo",
-          // "Filiberto Fortin",
-          // "Reagan Reichenbach",
-          // "Dacia Denley",
-        ];
 
-        let randomPerson =
-          randomUsers[Math.floor(Math.random() * (randomUsers.length - 1))];
+    if (users.length < 5) {
+      const randomUsers = [
+        "Christen Coggin",
+        "Buddy Blakely",
+        "Britany Bowie",
+        "Rashad Roa",
+        "Teresia Tenenbaum",
+        "Loma Lisk",
+        "Emilee Eslick",
+        "Tamera Trollinger",
+        "Ethelene Eis",
+        "Janita Jester",
+        "Harris Hagedorn",
+        "Verona Vina",
+        "Lenita Levitsky",
+        "Lida Lindgren",
+        "Paola Paquin",
+        "Dianna Doman",
+        "Ashanti Amo",
+        "Filiberto Fortin",
+        "Reagan Reichenbach",
+        "Dacia Denley",
+      ];
+      let randomPerson =
+        randomUsers[Math.floor(Math.random() * (randomUsers.length - 1))];
 
-        usersApiService.postUsers(randomPerson).then((res) => {
-          this.populateList();
-        });
-        this.setState({
-          timeToPick: 5,
-        });
-      } else {
-        usersApiService.deleteUser().then((res) => {
-          console.log("delete service run");
-        });
-      }
-      //needs a check for if its the user or name is from list of randomusers
-    } else {
-      this.setState({
-        timeToPick: timer - 1,
+      usersApiService.postUsers(randomPerson).then((res) => {
+        this.populateList(res);
       });
-      this.populateList();
     }
+
+    usersApiService.deleteUser().then((res) => {
+      this.populateList(res);
+    });
+    //needs a check for if its the user or name is from list of randomusers
   }
 
   render() {
-    const { cat, dog, users, error, currentUser, timeToPick } = this.state;
+    const { cat, dog, users, error, currentUser } = this.state;
 
     return (
       <div>
@@ -164,34 +171,24 @@ export default class AdoptionPage extends Component {
             <form className="nameForm" onSubmit={this.handleAddPerson}>
               <label htmlFor="adoptForm">Name</label>
               <input name="name" type="text" />
-              <button type="submit">Get In Line</button>
+              <button disabled={this.state.clientUser !== ""} type="submit">
+                Get In Line
+              </button>
             </form>
           </div>
           <Users users={users} />
         </section>
 
         <div className="adopt window">
-          <h2>
-            {currentUser.name} has {timeToPick} seconds to pick
-          </h2>
+          <h2>{currentUser}'s pick</h2>
           <section className="petInfo light window">
             <h2>Dogs</h2>
-            <Adopt
-              dog={dog}
-              adopt={this.adoptDog}
-              user={users}
-              error={error}
-            />
+            <Adopt dog={dog} adopt={this.adoptDog} user={users} error={error} />
           </section>
 
           <section className="petInfo light window">
             <h2>Cats</h2>
-            <Adopt
-              cat={cat}
-              adopt={this.adoptCat}
-              user={users}
-              error={error}
-            />
+            <Adopt cat={cat} adopt={this.adoptCat} user={users} error={error} />
           </section>
         </div>
       </div>
