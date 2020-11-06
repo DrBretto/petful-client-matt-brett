@@ -1,11 +1,9 @@
 import React, { Component } from "react";
-//import "./adoptionpage.css";
 import People from "../People/People";
 import Adopt from "../Adopt/Adopt";
 import petsApiService from "../Services/pets-service";
 import peopleApiService from "../Services/people-service";
-//import Trigger from "../TakeHome/Trigger";
-//import TakeHome from "../TakeHome/TakeHome";
+import './AdoptionPage.css'
 
 export default class AdoptionPage extends Component {
   state = {
