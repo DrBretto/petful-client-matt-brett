@@ -86,9 +86,12 @@
     rgba(144, 144, 144, 0.764) 76.4%,
     rgba(123, 123, 123, 0.764) 100%
   );
+  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
   color: rgba(5, 5, 5, 1);
   text-shadow: none;
   font-weight: 1000;
+  height: 305px;
+  margin: 4px;
 }
 
 .light {

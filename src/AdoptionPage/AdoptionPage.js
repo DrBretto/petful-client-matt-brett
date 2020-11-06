@@ -28,19 +28,26 @@ export default class AdoptionPage extends Component {
       })
       .catch((res) => this.setState({ error: res.message }));
 
-    peopleApiService.getPeople().then((res) => {
+    peopleApiService
+    .getPeople()
+    .then((res) => {
       this.setState({
         people: res,
         nextInLine: res[0],
       });
     });
     setInterval(() => {
+      console.log('adding person to list')
       this.handleDemo();
     }, 5000);
   }
+  componentWillUnmount(){
+    clearInterval(this.intervalId)
+  }
 
   adoptCat = () => {
-    petsApiService.deletePets("cat");
+    petsApiService
+    .deletePets("cat");
     const people = this.state.people;
     const cats = this.state.cats;
     cats.shift();
@@ -55,7 +62,8 @@ export default class AdoptionPage extends Component {
     });
   };
   adoptDog = () => {
-    petsApiService.deletePets("dog");
+    petsApiService
+    .deletePets("dog");
     const people = this.state.people;
     const dogs = this.state.dogs;
     dogs.shift();
@@ -77,7 +85,12 @@ export default class AdoptionPage extends Component {
          return null
       }
     const people = this.state.people;
-    peopleApiService.postPeople(name.value).then(() => {
+    peopleApiService
+    .postPeople(name.value)
+    .then((res) => {
+    //   this.interval = setInterval(() => {
+    //   this.handleDemo();
+    // }, 5000);
       people.push(name.value);
       this.setState({
         people: people,
@@ -96,7 +109,6 @@ export default class AdoptionPage extends Component {
     if (people.length === 0) {
       clearInterval(this.intervalId);
     }
-    if (nextInLine === currentPerson) {
       if (people.length < 5) {
         const random = [
           "Peter Parker",
@@ -104,17 +116,45 @@ export default class AdoptionPage extends Component {
           "Natasha Rominof",
           "Billy Baxton",
           "Melvin White",
+          "Christen Coggin",
+          "Buddy Blakely",
+          "Britany Bowie",
+          "Rashad Roa",
+          "Teresia Tenenbaum",
+          "Loma Lisk",
+          "Emilee Eslick",
+          "Tamera Trollinger",
+          "Ethelene Eis",
+          "Janita Jester",
+          "Harris Hagedorn",
+          "Verona Vina",
+          "Lenita Levitsky",
+          "Lida Lindgren",
+          "Paola Paquin",
+          "Dianna Doman",
+          "Ashanti Amo",
+          "Filiberto Fortin",
+          "Reagan Reichenbach",
+          "Dacia Denley",
         ];
-        let i = Math.floor(Math.random() * 5);
-        peopleApiService.postPeople(random[i]).then(() => {
+        let i = Math.floor(Math.random() * (random.length - 1));
+        peopleApiService
+        .postPeople(random[i])
+        .then(() => {
           people.push(random[i]);
-          this.setState({ people: people });
+          this.setState({ 
+            people: people,
+             added:true  
+            });
         });
       }
-    } else if (nextInLine !== currentPerson && this.state.added === true) {
+    if (nextInLine !== currentPerson && this.state.added === true) {
       const pet = people.length % 2 === 0 ? "cats" : "dogs";
-      petsApiService.deletePets(pet);
-      peopleApiService.deletePeople().then(() => {
+      petsApiService
+      .deletePets(pet);
+      peopleApiService
+      .deletePeople()
+      .then(() => {
         if (pet === "cats") {
           cats.shift();
         }
@@ -138,44 +178,50 @@ export default class AdoptionPage extends Component {
     if (cats) {
       return (
         <div className="mainContainer">
-          <ol>
+          <div className="users">
+          <ol className="usersList">
             <People people={people} />
           </ol>
-          {!this.state.added && (
-            <form className="nameForm" onSubmit={this.handleAddPerson}>
+          {/* {!this.state.added && ( */}
+            <form className="userInput" onSubmit={this.handleAddPerson}>
               <label htmlFor="adoptForm">Name</label>
               <input name="name" type="text" />
               <button type="submit">Get In Line</button>
             </form>
-          )}
+          {/* )} */}
+          </div>
           <div>
             <section>
-              <h2>Dogs</h2>
-              {dogs.length > 0 ? (
-                <Adopt
-                  dogs={dogs[0]}
-                  adoptDog={this.adoptDog}
-                  error={error}
-                  currentPerson={currentPerson}
-                  nextInLine={nextInLine}
-                />
-              ) : (
-                <h2>No dogs to adopt</h2>
-              )}
+              <div className="white">
+                <h2>Dogs</h2>
+                {dogs.length > 0 ? (
+                  <Adopt
+                    dogs={dogs[0]}
+                    adoptDog={this.adoptDog}
+                    error={error}
+                    currentPerson={currentPerson}
+                    nextInLine={nextInLine}
+                  />
+                ) : (
+                  <h2>No dogs to adopt</h2>
+                )}
+              </div>
             </section>
             <section>
-              <h2>Cats</h2>
-              {cats.length > 0 ? (
-                <Adopt
-                  cats={cats[0]}
-                  adoptCat={this.adoptCat}
-                  error={error}
-                  currentPerson={currentPerson}
-                  nextInLine={nextInLine}
-                />
-              ) : (
-                <h2>No cats to adopt</h2>
-              )}
+              <div className="white">
+                <h2>Cats</h2>
+                {cats.length > 0 ? (
+                  <Adopt
+                    cats={cats[0]}
+                    adoptCat={this.adoptCat}
+                    error={error}
+                    currentPerson={currentPerson}
+                    nextInLine={nextInLine}
+                  />
+                ) : (
+                  <h2>No cats to adopt</h2>
+                )}
+              </div>
             </section>
           </div>
         </div>

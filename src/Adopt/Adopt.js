@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import './adopt.css'
+// import './adopt.css'
 
 export default class Adopt extends Component {
   constructor(props) {

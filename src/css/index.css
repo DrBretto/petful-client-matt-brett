@@ -1,6 +1,7 @@
 html > * {
   color: black;
   font-size: 1em;
+  height:100%;
 }
 
 .adopt,
@@ -19,9 +20,12 @@ html > * {
 
 .users {
   display: flex;
+  flex-direction: row-reverse;
+  justify-content: flex-end;
 }
 
 .userList {
+  
   width: 40%;
   text-align: right;
   padding: 0.5em;
