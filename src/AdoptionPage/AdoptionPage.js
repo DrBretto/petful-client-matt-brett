@@ -101,11 +101,11 @@ export default class AdoptionPage extends Component {
     if (nextInLine === currentPerson) {
       if (people.length < 5) {
         const random = [
-          "Cheddar Bob",
-          "Billy Bob",
-          "Bobcat Goldthwait",
-          "Uncle Bob",
-          "What about Bob",
+          "Peter Parker",
+          "Tony Stark",
+          "Natasha Rominof",
+          "Billy Baxton",
+          "Melvin White",
         ];
         let i = Math.floor(Math.random() * 5);
         peopleApiService.postPeople(random[i]).then(() => {
