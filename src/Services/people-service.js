@@ -2,13 +2,13 @@ import config from '../config';
 
 const peopleApiService = { 
   getPeople() {
-    return fetch(`${config.API_ENDPOINT}/people`)
+    return fetch(`${config.REACT_APP_API_BASE}/people`)
       .then(res =>
         !res.ok ? res.json().then(e => Promise.reject(e)) : res.json());
   },
   postPeople(data){
     let name ={name:data}
-    return fetch(`${config.API_ENDPOINT}/people`, {
+    return fetch(`${config.REACT_APP_API_BASE}/people`, {
       method: 'POST',
       headers: {'content-type': 'application/json'},
       body: JSON.stringify(name)
@@ -18,7 +18,7 @@ const peopleApiService = {
   );
   },
   deletePeople() {
-    return fetch(`${config.API_ENDPOINT}/people`, {
+    return fetch(`${config.REACT_APP_API_BASE}/people`, {
       method: 'DELETE',
       headers: {
         'content-type': 'application/json',
