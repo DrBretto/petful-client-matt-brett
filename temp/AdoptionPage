@@ -1,0 +1,197 @@
+import React, { Component } from "react";
+import Users from "../Users/Users";
+import Adopt from "../Adopt/Adopt";
+//import petsApiService from "../services/pets-service";
+import dogsApiService from "../services/dogs-service";
+import catsApiService from "../services/cats-service";
+import usersApiService from "../services/users-service";
+
+export default class AdoptionPage extends Component {
+  state = {
+    cat: {},
+    dog: {},
+    users: [],
+    currentUser: "Nobody",
+    clientUser: "",
+  };
+
+  componentDidMount() {
+    dogsApiService
+      .getDogs()
+      .then((res) => {
+        this.setState({
+          dog: res.data,
+        });
+      })
+      .catch((res) => this.setState({ error: res.message }));
+
+    catsApiService
+      .getCats()
+      .then((res) => {
+        this.setState({
+          cat: res.data,
+        });
+      })
+      .catch((res) => this.setState({ error: res.message }));
+
+    usersApiService
+      .getUsers()
+      .then((res) => {
+      console.log("AdoptionPage -> componentDidMount -> res", res)
+        this.populateList(res);
+      })
+      .catch((res) => this.setState({ error: res.message }));
+  }
+
+  deleteDog = () => {
+    dogsApiService.deleteDog();
+    let updatedDogs = [...this.state.dogs];
+    updatedDogs.shift();
+    this.updateUser();
+    this.setState({
+      dogs: updatedDogs,
+    });
+  };
+
+  deleteCat = () => {
+    catsApiService.deleteCat();
+    let updatedCats = [...this.state.cats];
+    updatedCats.shift();
+    this.updateUser();
+    this.setState({
+      cats: updatedCats,
+    });
+  };
+
+  adoptDog = (option) => {
+    if (option === "both") {
+      this.adoptPet("both");
+    } else {
+      this.adoptPet("dogs");
+    }
+    this.deleteDog();
+  };
+
+  adoptCat = (option) => {
+    if (option === "both") {
+      this.adoptPet("both");
+    } else {
+      this.adoptPet("cats");
+    }
+    this.deleteCat();
+  };
+
+  populateList(data) {
+    console.log("AdoptionPage -> populateList -> data", data);
+    let users = [];
+
+    if (data.hasOwnProperty("next")) {
+      users[0] = data.data;
+      if (!!data.hasOwnProperty("next")) {
+        users[1] = data.next.data;
+        if (!!data.next.hasOwnProperty("next")) {
+          users[2] = data.next.next.data;
+          if (!!data.next.next.hasOwnProperty("next")) {
+            users[3] = data.next.next.next.data;
+            if (!!data.next.next.next.hasOwnProperty("next")) {
+              users[4] = data.next.next.next.next.data;
+            }
+          }
+        }
+      }
+
+      this.setState({
+        currentUser: users[0],
+        users: users,
+      });
+    }
+
+    console.log("AdoptionPage -> populateList -> users", this.state.users);
+  }
+
+  handleAddPerson = (e) => {
+    e.preventDefault();
+    const { name } = e.target;
+    usersApiService.postUsers(name.value).then((res) => {
+      this.interval = setInterval(() => {
+        this.handleInterval();
+      }, 5000);
+      this.populateList(res);
+    });
+  };
+
+  handleInterval() {
+    let users = this.state.users;
+
+    if (users.length < 5) {
+      const randomUsers = [
+        "Christen Coggin",
+        "Buddy Blakely",
+        "Britany Bowie",
+        "Rashad Roa",
+        "Teresia Tenenbaum",
+        "Loma Lisk",
+        "Emilee Eslick",
+        "Tamera Trollinger",
+        "Ethelene Eis",
+        "Janita Jester",
+        "Harris Hagedorn",
+        "Verona Vina",
+        "Lenita Levitsky",
+        "Lida Lindgren",
+        "Paola Paquin",
+        "Dianna Doman",
+        "Ashanti Amo",
+        "Filiberto Fortin",
+        "Reagan Reichenbach",
+        "Dacia Denley",
+      ];
+      let randomPerson =
+        randomUsers[Math.floor(Math.random() * (randomUsers.length - 1))];
+
+      usersApiService.postUsers(randomPerson).then((res) => {
+        this.populateList(res);
+      });
+    }
+
+    usersApiService.deleteUser().then((res) => {
+      this.populateList(res);
+    });
+    //needs a check for if its the user or name is from list of randomusers
+  }
+
+  render() {
+    const { cat, dog, users, error, currentUser } = this.state;
+
+    return (
+      <div>
+        <section className="users light window">
+          <div className="userInput">
+            <h2> People in line to adopt {"--->"}</h2>
+            <form className="nameForm" onSubmit={this.handleAddPerson}>
+              <label htmlFor="adoptForm">Name</label>
+              <input name="name" type="text" />
+              <button disabled={this.state.clientUser !== ""} type="submit">
+                Get In Line
+              </button>
+            </form>
+          </div>
+          <Users users={users} />
+        </section>
+
+        <div className="adopt window">
+          <h2>{currentUser}'s pick</h2>
+          <section className="petInfo light window">
+            <h2>Dogs</h2>
+            <Adopt dog={dog} adopt={this.adoptDog} user={users} error={error} />
+          </section>
+
+          <section className="petInfo light window">
+            <h2>Cats</h2>
+            <Adopt cat={cat} adopt={this.adoptCat} user={users} error={error} />
+          </section>
+        </div>
+      </div>
+    );
+  }
+}

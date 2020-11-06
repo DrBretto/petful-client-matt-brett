@@ -1,197 +1,189 @@
 import React, { Component } from "react";
-import Users from "../Users/Users";
+//import "./adoptionpage.css";
+import People from "../People/People";
 import Adopt from "../Adopt/Adopt";
-//import petsApiService from "../services/pets-service";
-import dogsApiService from "../services/dogs-service";
-import catsApiService from "../services/cats-service";
-import usersApiService from "../services/users-service";
+import petsApiService from "../Services/pets-service";
+import peopleApiService from "../Services/people-service";
+//import Trigger from "../TakeHome/Trigger";
+//import TakeHome from "../TakeHome/TakeHome";
 
 export default class AdoptionPage extends Component {
   state = {
-    cat: {},
-    dog: {},
-    users: [],
-    currentUser: "Nobody",
-    clientUser: "",
+    cats: [],
+    dogs: [],
+    people: [],
+    confirm: false,
+    currentPerson: "",
+    nextInLine: "",
+    added: false,
+    error: {},
   };
 
   componentDidMount() {
-    dogsApiService
-      .getDogs()
+    petsApiService
+      .getPets()
       .then((res) => {
         this.setState({
-          dog: res.data,
+          cats: res.cats,
+          dogs: res.dogs,
         });
       })
       .catch((res) => this.setState({ error: res.message }));
 
-    catsApiService
-      .getCats()
-      .then((res) => {
-        this.setState({
-          cat: res.data,
-        });
-      })
-      .catch((res) => this.setState({ error: res.message }));
-
-    usersApiService
-      .getUsers()
-      .then((res) => {
-      console.log("AdoptionPage -> componentDidMount -> res", res)
-        this.populateList(res);
-      })
-      .catch((res) => this.setState({ error: res.message }));
-  }
-
-  deleteDog = () => {
-    dogsApiService.deleteDog();
-    let updatedDogs = [...this.state.dogs];
-    updatedDogs.shift();
-    this.updateUser();
-    this.setState({
-      dogs: updatedDogs,
-    });
-  };
-
-  deleteCat = () => {
-    catsApiService.deleteCat();
-    let updatedCats = [...this.state.cats];
-    updatedCats.shift();
-    this.updateUser();
-    this.setState({
-      cats: updatedCats,
-    });
-  };
-
-  adoptDog = (option) => {
-    if (option === "both") {
-      this.adoptPet("both");
-    } else {
-      this.adoptPet("dogs");
-    }
-    this.deleteDog();
-  };
-
-  adoptCat = (option) => {
-    if (option === "both") {
-      this.adoptPet("both");
-    } else {
-      this.adoptPet("cats");
-    }
-    this.deleteCat();
-  };
-
-  populateList(data) {
-    console.log("AdoptionPage -> populateList -> data", data);
-    let users = [];
-
-    if (data.hasOwnProperty("next")) {
-      users[0] = data.data;
-      if (!!data.hasOwnProperty("next")) {
-        users[1] = data.next.data;
-        if (!!data.next.hasOwnProperty("next")) {
-          users[2] = data.next.next.data;
-          if (!!data.next.next.hasOwnProperty("next")) {
-            users[3] = data.next.next.next.data;
-            if (!!data.next.next.next.hasOwnProperty("next")) {
-              users[4] = data.next.next.next.next.data;
-            }
-          }
-        }
-      }
-
+    peopleApiService.getPeople().then((res) => {
       this.setState({
-        currentUser: users[0],
-        users: users,
+        people: res,
+        nextInLine: res[0],
       });
-    }
-
-    console.log("AdoptionPage -> populateList -> users", this.state.users);
+    });
+    setInterval(() => {
+      this.handleDemo();
+    }, 5000);
   }
 
+  adoptCat = () => {
+    petsApiService.deletePets("cat");
+    const people = this.state.people;
+    const cats = this.state.cats;
+    cats.shift();
+    people.shift();
+    this.setState({
+      people: people,
+      cats: cats,
+      confirm: true,
+      nextInLine: people[0],
+      currentUser: "",
+      added:false,
+    });
+  };
+  adoptDog = () => {
+    petsApiService.deletePets("dog");
+    const people = this.state.people;
+    const dogs = this.state.dogs;
+    dogs.shift();
+    people.shift();
+    this.setState({
+      people: people,
+      dogs: dogs,
+      confirm: true,
+      nextInLine: people[0],
+      currentUser: "",
+      added:false,
+    });
+  };
   handleAddPerson = (e) => {
     e.preventDefault();
     const { name } = e.target;
-    usersApiService.postUsers(name.value).then((res) => {
-      this.interval = setInterval(() => {
-        this.handleInterval();
-      }, 5000);
-      this.populateList(res);
+      if(name.value === '') {
+         alert("Name must be valid")
+         return null
+      }
+    const people = this.state.people;
+    peopleApiService.postPeople(name.value).then(() => {
+      people.push(name.value);
+      this.setState({
+        people: people,
+        currentPerson: name.value,
+        added: true,
+      });
     });
   };
 
-  handleInterval() {
-    let users = this.state.users;
-
-    if (users.length < 5) {
-      const randomUsers = [
-        "Christen Coggin",
-        "Buddy Blakely",
-        "Britany Bowie",
-        "Rashad Roa",
-        "Teresia Tenenbaum",
-        "Loma Lisk",
-        "Emilee Eslick",
-        "Tamera Trollinger",
-        "Ethelene Eis",
-        "Janita Jester",
-        "Harris Hagedorn",
-        "Verona Vina",
-        "Lenita Levitsky",
-        "Lida Lindgren",
-        "Paola Paquin",
-        "Dianna Doman",
-        "Ashanti Amo",
-        "Filiberto Fortin",
-        "Reagan Reichenbach",
-        "Dacia Denley",
-      ];
-      let randomPerson =
-        randomUsers[Math.floor(Math.random() * (randomUsers.length - 1))];
-
-      usersApiService.postUsers(randomPerson).then((res) => {
-        this.populateList(res);
+  handleDemo() {
+    let people = this.state.people;
+    let cats = this.state.cats;
+    let dogs = this.state.dogs;
+    const currentPerson = this.state.currentPerson;
+    let nextInLine = this.state.nextInLine;
+    if (people.length === 0) {
+      clearInterval(this.intervalId);
+    }
+    if (nextInLine === currentPerson) {
+      if (people.length < 5) {
+        const random = [
+          "Cheddar Bob",
+          "Billy Bob",
+          "Bobcat Goldthwait",
+          "Uncle Bob",
+          "What about Bob",
+        ];
+        let i = Math.floor(Math.random() * 5);
+        peopleApiService.postPeople(random[i]).then(() => {
+          people.push(random[i]);
+          this.setState({ people: people });
+        });
+      }
+    } else if (nextInLine !== currentPerson && this.state.added === true) {
+      const pet = people.length % 2 === 0 ? "cats" : "dogs";
+      petsApiService.deletePets(pet);
+      peopleApiService.deletePeople().then(() => {
+        if (pet === "cats") {
+          cats.shift();
+        }
+        if (pet === "dogs") {
+          dogs.shift();
+        }
+        people.shift();
+        this.setState({
+          people: people,
+          cats: cats,
+          dogs: dogs,
+          nextInLine: people[0],
+        });
       });
     }
-
-    usersApiService.deleteUser().then((res) => {
-      this.populateList(res);
-    });
-    //needs a check for if its the user or name is from list of randomusers
   }
 
   render() {
-    const { cat, dog, users, error, currentUser } = this.state;
-
-    return (
-      <div>
-        <section className="users light window">
-          <div className="userInput">
-            <h2> People in line to adopt {"--->"}</h2>
+    const { cats, dogs, nextInLine, people, error, currentPerson } = this.state;
+    console.log(cats);
+    if (cats) {
+      return (
+        <div className="mainContainer">
+          <ol>
+            <People people={people} />
+          </ol>
+          {!this.state.added && (
             <form className="nameForm" onSubmit={this.handleAddPerson}>
               <label htmlFor="adoptForm">Name</label>
               <input name="name" type="text" />
-              <button disabled={this.state.clientUser !== ""} type="submit">
-                Get In Line
-              </button>
+              <button type="submit">Get In Line</button>
             </form>
+          )}
+          <div>
+            <section>
+              <h2>Dogs</h2>
+              {dogs.length > 0 ? (
+                <Adopt
+                  dogs={dogs[0]}
+                  adoptDog={this.adoptDog}
+                  error={error}
+                  currentPerson={currentPerson}
+                  nextInLine={nextInLine}
+                />
+              ) : (
+                <h2>No dogs to adopt</h2>
+              )}
+            </section>
+            <section>
+              <h2>Cats</h2>
+              {cats.length > 0 ? (
+                <Adopt
+                  cats={cats[0]}
+                  adoptCat={this.adoptCat}
+                  error={error}
+                  currentPerson={currentPerson}
+                  nextInLine={nextInLine}
+                />
+              ) : (
+                <h2>No cats to adopt</h2>
+              )}
+            </section>
           </div>
-          <Users users={users} />
-        </section>
-
-        <div className="adopt window">
-          <h2>{currentUser}'s pick</h2>
-          <section className="petInfo light window">
-            <h2>Dogs</h2>
-            <Adopt dog={dog} adopt={this.adoptDog} user={users} error={error} />
-          </section>
-
-          <section className="petInfo light window">
-            <h2>Cats</h2>
-            <Adopt cat={cat} adopt={this.adoptCat} user={users} error={error} />
-          </section>
         </div>
-      </div>
-    );
+      );
+    } else {
+      return <div></div>;
+    }
   }
 }

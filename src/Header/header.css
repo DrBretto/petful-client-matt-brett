@@ -1,9 +1,11 @@
-header{
+header
+{
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
     text-align: center;
 }
-
-header a{
+header a {
     text-decoration: none;
-    color: #fdbd0e;
-    line-height: 1.5em
+    color: #000000;  
 }

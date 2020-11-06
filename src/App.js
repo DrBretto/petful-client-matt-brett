@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Route, Switch } from "react-router-dom";
+import { Route, Link, Switch } from "react-router-dom";
 import Header from "./Header/Header";
 import AdoptionPage from "./AdoptionPage/AdoptionPage";
 import LandingPage from "./LandingPage/LandingPage";
@@ -19,4 +19,3 @@ export default class App extends Component {
     );
   }
 }
-
