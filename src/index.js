@@ -1,6 +1,6 @@
-import './css/index.css'
-import './css/gradients.css'
 import './css/setup.css'
+import './css/gradients.css'
+import './css/index.css'
 import { BrowserRouter } from 'react-router-dom'
 import React from 'react'
 import ReactDOM from 'react-dom'
