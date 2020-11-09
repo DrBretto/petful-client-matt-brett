@@ -3,7 +3,6 @@ import React, { Component } from "react";
 export default class People extends Component {
   renderPeople() {
     const people = [...this.props.people];
-    console.log("People -> renderPeople -> people", people)
     if (people.length < 5) {
       for (let i = people.length; i < 5; i++) {
         people[i] = "  -----  ";
@@ -12,9 +11,6 @@ export default class People extends Component {
     if (people.length >= 5) {
       people.slice(4);
     }
-
-    console.log("People -> renderPeople -> people", people)
-
     const peopleList = people.map((person, i) => {
       return <li key={i}>{person}</li>;
     });
