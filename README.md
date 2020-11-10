@@ -11,7 +11,7 @@ This application is designed around the First in, First out queue structure.
 
 the user can join a queue, watch as other users make their selection of pets up for adoption, and when it is their turn, make their own selection. they can also see users joining the queue after them. 
 
-only the first cat and dog of each queue is available for adoption. and once the user makes their selection, they are removed from the queue until they decide to rejoin. thus the process starts over again until all the pets have been adopted. 
+Only the first cat and dog of each queue is available for adoption. and once the user makes their selection, they are removed from the queue until they decide to rejoin. thus the process starts over again until all the pets have been adopted. 
 
 # Tech Stack - 
 
