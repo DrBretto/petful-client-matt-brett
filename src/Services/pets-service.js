@@ -16,7 +16,7 @@ const petsApiService = {
       },
       body: JSON.stringify({ type: pet }),
     }).then((res) =>
-      !res.ok ? res.json().then((e) => Promise.reject(e)) : res
+      !res.ok ? res.json().then((e) => Promise.reject(e)) : res.json()
     );
   },
 };

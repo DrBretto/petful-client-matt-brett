@@ -10,7 +10,6 @@ export default class AdoptionPage extends Component {
     cats: [],
     dogs: [],
     people: [],
-    confirm: false,
     currentPerson: "",
     nextInLine: "",
     added: false,
@@ -29,9 +28,10 @@ export default class AdoptionPage extends Component {
     petsApiService
       .getPets()
       .then((res) => {
+        console.log("AdoptionPage -> res", res);
         this.setState({
-          cats: res.cats,
-          dogs: res.dogs,
+          cats: res[0],
+          dogs: res[1],
         });
       })
       .catch((res) => this.setState({ error: res.message }));
@@ -39,7 +39,7 @@ export default class AdoptionPage extends Component {
     peopleApiService.getPeople().then((res) => {
       this.setState({
         people: res,
-        nextInLine: res[1],
+        nextInLine: res[0],
       });
     });
   };
@@ -50,39 +50,34 @@ export default class AdoptionPage extends Component {
 
   adoptCat = () => {
     const adopted = this.state.cats[0];
-
-    peopleApiService.deletePeople().then((res) => {
+    petsApiService.deletePet("cat").then((res) => {
       this.setState({
-        people: res,
-        nextInLine: res[1],
-      });
-    });
-    petsApiService.deletePet("cat").then(
-      this.setState({
+        cats: res.pets[0],
+        dogs: res.pets[1],
         currentUser: "",
         added: false,
         yourTurn: false,
         adopted: adopted,
-      })
-    );
+        people: res,
+        nextInLine: res.people[1],
+      });
+    });
   };
 
   adoptDog = () => {
     const adopted = this.state.dogs[0];
-    peopleApiService.deletePeople().then((res) => {
+    petsApiService.deletePet("dog").then((res) => {
       this.setState({
-        people: res,
-        nextInLine: res[1],
-      });
-    });
-    petsApiService.deletePet("dog").then(
-      this.setState({
+        cats: res.pets[0],
+        dogs: res.pets[1],
         currentUser: "",
         added: false,
         yourTurn: false,
         adopted: adopted,
-      })
-    );
+        people: res,
+        nextInLine: res.people[1],
+      });
+    });
   };
 
   handleAddPerson = (e) => {
@@ -101,14 +96,14 @@ export default class AdoptionPage extends Component {
     peopleApiService.postPeople(name.value).then((res) => {
       this.setState({
         people: res,
-        nextInLine: res[1],
+        nextInLine: res[0],
         currentPerson: name.value,
         added: true,
       });
 
       this.intervalId = setInterval(() => {
         this.handleDemo();
-      }, 1000);
+      }, 5000);
     });
   };
 
@@ -148,23 +143,23 @@ export default class AdoptionPage extends Component {
         "Dacia Denley",
       ];
       let i = Math.floor(Math.random() * (random.length - 1));
-      let pet = Math.floor(Math.random() * 2) === 0 ? "dog" : "cat";
-      console.log("AdoptionPage -> handleDemo -> pet", pet);
-      petsApiService.deletePet(pet);
 
       peopleApiService.postPeople(random[i]).then((res) => {
         this.setState({
-          nextInLine: res[1],
+          nextInLine: res[0],
           people: res,
           added: true,
         });
       });
     }
 
-    peopleApiService.deletePeople().then((res) => {
+    let pet = Math.floor(Math.random() * 2) === 0 ? "dog" : "cat";
+    petsApiService.deletePet(pet).then((res) => {
       this.setState({
-        nextInLine: res[1],
-        people: res,
+        cats: res.pets[0],
+        dogs: res.pets[1],
+        people: res.people,
+        nextInLine: res.people[1],
       });
     });
 
@@ -174,12 +169,15 @@ export default class AdoptionPage extends Component {
       });
       clearInterval(this.intervalId);
     }
-    this.update();
   }
 
   closeWindow = () => {
     this.setState({
       adopted: null,
+      currentPerson: "",
+      nextInLine: "",
+      added: false,
+      yourTurn: false,
     });
   };
 

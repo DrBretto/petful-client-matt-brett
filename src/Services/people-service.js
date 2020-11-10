@@ -8,7 +8,7 @@ const peopleApiService = {
   },
 
   postPeople(data) {
-    let name = { name: data };
+    let name = { person: data };
     return fetch(`${config.REACT_APP_API_BASE}/people`, {
       method: "POST",
       headers: { "content-type": "application/json" },
